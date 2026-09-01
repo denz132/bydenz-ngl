@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width,initial-scale=1">
+
+<title>BY DENZ NGL</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+
+    background:
+        linear-gradient(
+            135deg,
+            #fff0f5,
+            #f5f5ff
+        );
+
+    min-height: 100vh;
+    color: #222;
+}
+
+#loading {
+    position: fixed;
+    inset: 0;
+
+    z-index: 99;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff4f81,
+            #ff9bc0
+        );
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+    align-items: center;
+
+    color: white;
+
+    transition: .7s;
+}
+
+#loading.hide {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.anime {
+    font-size: 75px;
+
+    animation:
+        float 2s infinite;
+}
+
+.loading-title {
+    font-size: 28px;
+    font-weight: bold;
+    margin-top: 15px;
+}
+
+.loading-text {
+    margin-top: 8px;
+}
+
+.container {
+    width: 100%;
+    max-width: 520px;
+
+    margin: auto;
+
+    padding: 25px 18px;
+}
+
+.logo {
+    text-align: center;
+
+    color: #ff4f81;
+
+    font-size: 34px;
+    font-weight: bold;
+
+    margin-top: 15px;
+}
+
+.card {
+    background: white;
+
+    border-radius: 20px;
+
+    padding: 25px;
+
+    margin-top: 20px;
+
+    box-shadow:
+        0 10px 30px
+        rgba(0,0,0,.08);
+}
+
+.avatar {
+    width: 90px;
+    height: 90px;
+
+    border-radius: 50%;
+
+    margin: auto;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff4f81,
+            #ff9bc0
+        );
+
+    font-size: 40px;
+}
+
+h1,
+h2 {
+    text-align: center;
+}
+
+.subtitle {
+    text-align: center;
+    color: #888;
+}
+
+button,
+input,
+textarea {
+    width: 100%;
+
+    border-radius: 12px;
+
+    padding: 14px;
+
+    font-size: 15px;
+
+    border: 1px solid #ddd;
+
+    margin-top: 10px;
+}
+
+button {
+    border: 0;
+
+    background: #ff4f81;
+
+    color: white;
+
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: .9;
+}
+
+.links {
+    display: flex;
+    gap: 10px;
+}
+
+.links button {
+    flex: 1;
+}
+
+.result {
+    text-align: center;
+    margin-top: 12px;
+    font-size: 14px;
+}
+
+.admin {
+    display: block;
+
+    text-align: center;
+
+    margin-top: 20px;
+
+    color: #25d366;
+
+    text-decoration: none;
+
+    font-weight: bold;
+}
+
+@keyframes float {
+
+    50% {
+        transform:
+            translateY(-12px);
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="loading">
+
+    <div class="anime">
+        ◕‿◕
+    </div>
+
+    <div class="loading-title">
+        BY DENZ
+    </div>
+
+    <div class="loading-text">
+        Anonymous message platform
+    </div>
+
+</div>
+
+<div class="container">
+
+    <div class="logo">
+        NGL
+    </div>
+
+    <div class="card">
+
+        <div class="avatar">
+            💌
+        </div>
+
+        <h1>
+            BY DENZ
+        </h1>
+
+        <div class="subtitle">
+            Send anonymous messages
+        </div>
+
+        <div class="links">
+
+            <button onclick="location.href='/register.html'">
+                Register
+            </button>
+
+            <button onclick="location.href='/login.html'">
+                Login
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <h2>
+            💬 Kirim Pesan
+        </h2>
+
+        <input
+            id="username"
+            placeholder="Username penerima"
+        >
+
+        <textarea
+            id="message"
+            rows="4"
+            placeholder="Tulis pesan anonim..."
+        ></textarea>
+
+        <button onclick="sendMessage()">
+            Kirim Pesan
+        </button>
+
+        <div
+            id="result"
+            class="result">
+        </div>
+
+    </div>
+
+    <a
+        class="admin"
+        href="https://wa.me/"
+        target="_blank">
+
+        💬 Hubungi Admin via WhatsApp
+
+    </a>
+
+</div>
+
+<script>
+
+setTimeout(function() {
+
+    document
+        .getElementById("loading")
+        .classList
+        .add("hide");
+
+}, 1800);
+
+async function sendMessage() {
+
+    const username =
+        document
+        .getElementById("username")
+        .value
+        .trim();
+
+    const message =
+        document
+        .getElementById("message")
+        .value
+        .trim();
+
+    const result =
+        document
+        .getElementById("result");
+
+    if (!username || !message) {
+
+        result.innerText =
+            "❌ Lengkapi semua kolom.";
+
+        return;
+    }
+
+    result.innerText =
+        "⏳ Mengirim...";
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/message/" +
+                encodeURIComponent(username),
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify({
+                            message
+                        })
+                }
+            );
+
+        const data =
+            await response.json();
+
+        if (data.success) {
+
+            result.innerText =
+                "✅ Pesan berhasil dikirim!";
+
+            document
+                .getElementById("message")
+                .value = "";
+
+        } else {
+
+            result.innerText =
+                "❌ " + data.message;
+        }
+
+    } catch (error) {
+
+        result.innerText =
+            "❌ Server tidak dapat dihubungi.";
+
+    }
+
+}
+
+</script>
+
+</body>
+
+</html>

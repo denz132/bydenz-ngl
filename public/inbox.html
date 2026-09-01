@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width,initial-scale=1">
+
+<title>Inbox - BY DENZ</title>
+
+<style>
+
+body {
+    margin: 0;
+
+    background: #f5f5f5;
+
+    font-family: Arial;
+}
+
+.header {
+    background: white;
+
+    padding: 18px;
+
+    text-align: center;
+
+    color: #ff4f81;
+
+    font-size: 26px;
+
+    font-weight: bold;
+}
+
+.container {
+    max-width: 600px;
+
+    margin: auto;
+
+    padding: 20px;
+}
+
+.card {
+    background: white;
+
+    padding: 18px;
+
+    margin: 12px 0;
+
+    border-radius: 15px;
+
+    box-shadow:
+        0 5px 20px #00000010;
+}
+
+.time {
+    color: #999;
+
+    font-size: 12px;
+}
+
+button {
+    width: 100%;
+
+    padding: 13px;
+
+    border: 0;
+
+    border-radius: 12px;
+
+    background: #ff4f81;
+
+    color: white;
+
+    font-weight: bold;
+}
+
+.empty {
+    text-align: center;
+
+    color: #999;
+
+    padding: 50px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+    💌 BY DENZ INBOX
+</div>
+
+<div class="container">
+
+<h2 id="user">
+Loading...
+</h2>
+
+<button onclick="logout()">
+Logout
+</button>
+
+<div id="messages"></div>
+
+</div>
+
+<script>
+
+async function load() {
+
+    const me =
+        await fetch("/api/me");
+
+    const user =
+        await me.json();
+
+    if (!user.loggedIn) {
+
+        location.href =
+            "/login.html";
+
+        return;
+    }
+
+    document
+        .getElementById("user")
+        .innerText =
+        "@" + user.username;
+
+    const response =
+        await fetch("/api/inbox");
+
+    const data =
+        await response.json();
+
+    const box =
+        document
+        .getElementById("messages");
+
+    if (!data.messages.length) {
+
+        box.innerHTML =
+            '<div class="empty">💌<br><br>Belum ada pesan.</div>';
+
+        return;
+    }
+
+    box.innerHTML =
+        data.messages
+        .slice()
+        .reverse()
+        .map(function(item) {
+
+            return `
+            <div class="card">
+
+                <b>💌 Anonymous</b>
+
+                <p>
+                    ${escapeHTML(item.message)}
+                </p>
+
+                <div class="time">
+                    ${item.time}
+                </div>
+
+            </div>
+            `;
+
+        })
+        .join("");
+
+}
+
+function escapeHTML(text) {
+
+    const div =
+        document.createElement("div");
+
+    div.textContent =
+        text;
+
+    return div.innerHTML;
+
+}
+
+async function logout() {
+
+    await fetch(
+        "/api/logout",
+        {
+            method:"POST"
+        }
+    );
+
+    location.href =
+        "/";
+
+}
+
+load();
+
+setInterval(
+    load,
+    2000
+);
+
+</script>
+
+</body>
+
+</html>
