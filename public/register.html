@@ -1,54 +1,88 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+
 <title>Register - BY DENZ</title>
 
 <style>
-body{
-    margin:0;
-    min-height:100vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-family:Arial;
-    background:linear-gradient(135deg,#ff4f81,#ffb6ca);
+* {
+    box-sizing: border-box;
 }
 
-.card{
-    width:90%;
-    max-width:400px;
-    background:white;
-    padding:25px;
-    border-radius:20px;
-    box-shadow:0 15px 40px #0002;
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg,#ff4f81,#ffb6ca);
 }
 
-h1{
-    text-align:center;
-    color:#ff4f81;
+.card {
+    width: 100%;
+    max-width: 400px;
+    background: white;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px #0002;
 }
 
-input,button{
-    width:100%;
-    padding:14px;
-    margin-top:10px;
-    box-sizing:border-box;
-    border-radius:12px;
-    border:1px solid #ddd;
+h1 {
+    text-align: center;
+    color: #ff4f81;
+    margin-bottom: 25px;
 }
 
-button{
-    background:#ff4f81;
-    color:white;
-    border:0;
-    font-weight:bold;
+input {
+    width: 100%;
+    padding: 14px;
+    margin-top: 10px;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    outline: none;
+    font-size: 16px;
+    transition: .2s;
 }
 
-#result{
-    text-align:center;
-    margin-top:15px;
+input:focus {
+    border-color: #ff4f81;
+    box-shadow: 0 0 0 3px #ff4f8125;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 15px;
+    border-radius: 12px;
+    border: 0;
+    background: #ff4f81;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform .12s, opacity .2s;
+    touch-action: manipulation;
+}
+
+button:active {
+    transform: scale(.96);
+}
+
+button:disabled {
+    opacity: .65;
+    cursor: not-allowed;
+    transform: none;
+}
+
+#result {
+    text-align: center;
+    margin-top: 15px;
+    min-height: 20px;
+    font-size: 14px;
 }
 </style>
 </head>
@@ -61,14 +95,17 @@ button{
 
 <input
 id="username"
-placeholder="Username">
+type="text"
+placeholder="Username"
+autocomplete="username">
 
 <input
 id="password"
 type="password"
-placeholder="Password">
+placeholder="Password"
+autocomplete="new-password">
 
-<button onclick="register()">
+<button id="registerBtn" onclick="register()">
 Buat Akun
 </button>
 
@@ -78,59 +115,83 @@ Buat Akun
 
 <script>
 
-async function register(){
+async function register() {
 
     const username =
-        document.getElementById(
-            "username"
-        ).value;
+        document.getElementById("username").value.trim();
 
     const password =
-        document.getElementById(
-            "password"
-        ).value;
+        document.getElementById("password").value;
 
     const result =
-        document.getElementById(
-            "result"
-        );
+        document.getElementById("result");
 
-    const response =
-        await fetch(
-            "/api/register",
-            {
-                method:"POST",
-                headers:{
-                    "Content-Type":
-                        "application/json"
-                },
-                body:JSON.stringify({
-                    username,
-                    password
-                })
-            }
-        );
+    const button =
+        document.getElementById("registerBtn");
 
-    const data =
-        await response.json();
-
-    result.innerText =
-        data.success
-        ? "✅ Akun dibuat!"
-        : "❌ " + data.message;
-
-    if(data.success){
-
-        setTimeout(
-            () =>
-            location.href =
-            "/login.html",
-            1000
-        );
-
+    if (!username || !password) {
+        result.innerText =
+            "⚠️ Username dan password wajib diisi.";
+        return;
     }
 
+    button.disabled = true;
+    button.innerText = "⏳ Membuat akun...";
+    result.innerText = "";
+
+    try {
+
+        const response = await fetch("/api/register", {
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                username: username,
+                password: password
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+
+            result.innerText = "✅ Akun berhasil dibuat!";
+            button.innerText = "✅ Berhasil";
+
+            setTimeout(() => {
+                location.href = "/login.html";
+            }, 700);
+
+        } else {
+
+            result.innerText =
+                "❌ " + (data.message || "Gagal membuat akun.");
+
+            button.disabled = false;
+            button.innerText = "Buat Akun";
+        }
+
+    } catch (error) {
+
+        console.error(error);
+
+        result.innerText =
+            "❌ Tidak dapat terhubung ke server.";
+
+        button.disabled = false;
+        button.innerText = "Buat Akun";
+    }
 }
+
+// Tekan Enter untuk membuat akun
+document.addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+        register();
+    }
+});
 
 </script>
 
