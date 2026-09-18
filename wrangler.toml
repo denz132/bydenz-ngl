@@ -1,3 +1,12 @@
 name = "bydenz-ngl"
 main = "worker/index.js"
 compatibility_date = "2026-09-01"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "bydenz-db"
+database_id = "ef6c451c-3546-4e23-b43b-a04209b08ea7"
